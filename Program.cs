@@ -1,38 +1,27 @@
 ﻿using System.CommandLine;
 
-namespace scl;
+int taskIdCounter = 1;
 
-class Program
+//  Add a task
+var taskArgument = new Argument<string>("description")
 {
-    public static int taskIdCounter = 1;
+    Description = "Task description"
+};
+var addCommand = new Command("add", "Add a new task")
+{
+    taskArgument
+};
 
-    static int Main(string[] args)
-    {
-        var rootCommand = new RootCommand("TaskTracer Command-Line Tool");
+addCommand.SetAction((parseResult) =>
+{
+    var description = parseResult.GetValue(taskArgument);
+    taskIdCounter += 1;
+    Console.WriteLine($"Output: Task added successfully(ID: {taskIdCounter})");
+    Console.WriteLine($"Task: {taskArgument}");
+    return 0;
+});
 
-        //  Add Task
-        var addCommand = new Command("add", "Add a new task");
-        var updateCommand = new Command("update", "Update a task");
-        var deleteCommand = new Command("delete", "Delete a task");
+var rootCommand = new RootCommand("TaskTracer Command-Line Tool");
+rootCommand.Subcommands.Add(addCommand);
 
-        rootCommand.Subcommands.Add(addCommand);
-        rootCommand.Subcommands.Add(updateCommand);
-        rootCommand.Subcommands.Add(deleteCommand);
-
-        addCommand.SetAction(parseResult =>
-        {
-            string task = Console.ReadLine() ?? string.Empty;
-            AddCommand(task);
-            return 0;
-        });
-
-        ParseResult parseResult = rootCommand.Parse(args);
-        return parseResult.Invoke();
-    }
-
-    static void AddCommand(string task)
-    {
-        taskIdCounter += 1;
-        Console.WriteLine($"Output: Task added successfully(ID: {taskIdCounter})");
-    }
-}
+return rootCommand.Parse(args).Invoke();
