@@ -4,7 +4,10 @@ using System.Text;
 
 namespace scl.Enums
 {
-    internal class StatusTODO
+    public enum TaskStatusTodo
     {
+        Done,
+        Todo,
+        InProgress
     }
 }

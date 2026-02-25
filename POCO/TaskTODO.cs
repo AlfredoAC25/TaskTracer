@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using scl.Enums;
 
 namespace scl.POCO
 {
@@ -8,7 +9,7 @@ namespace scl.POCO
     {
         public int id { get; set; }
         public string description { get; set; }
-        public string status { get; set; }
+        public TaskStatusTodo status { get; set; }
         public DateTime createdAt { get; set; }
         public DateTime updatedAt { get; set; }
     }

@@ -1,7 +1,8 @@
-﻿using System;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Text.Json;
 using scl.POCO;
+using System.Linq;
+using scl.Enums;
 
 public class Program
 {
@@ -34,19 +35,32 @@ public class Program
 
     public static void addTask(string description)
     {
+        List<TaskTODO> tasks = new List<TaskTODO>();
+
+        string existingJson = File.ReadAllText("TaskTODO.json");
+
+        if(!string.IsNullOrWhiteSpace(existingJson))
+        {
+            tasks = JsonSerializer.Deserialize<List<TaskTODO>>(existingJson) ?? new List<TaskTODO>();
+        }
+        
+
+        int taskIdCounter = tasks.Count > 0 ? tasks.Max(tasks => tasks.id) + 1 : 1;
+
         TaskTODO newTask = new TaskTODO
         {
             id = taskIdCounter,
             description = description,
-            status = "Pending",
+            status = TaskStatusTodo.Todo,
             createdAt = DateTime.Now,
             updatedAt = DateTime.Now
         };
 
-        taskIdCounter++;
+        tasks.Add(newTask);
 
         string fileName = "TaskTODO.json";
-        string jsonString = JsonSerializer.Serialize(newTask);
+        string jsonString  = JsonSerializer.Serialize<List<TaskTODO>>(tasks, new JsonSerializerOptions { WriteIndented = true });
+
         File.WriteAllText(fileName, jsonString);
 
         Console.WriteLine($"Output: Task added successfully (ID: {Guid.NewGuid()})");
