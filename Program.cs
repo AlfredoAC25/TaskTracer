@@ -57,9 +57,25 @@ public class Program
             return 0;
         });
 
+        //  Delete a task
+        var deleteCommand = new Command("delete", "Delete a task")
+        {
+            getTaskIdArgument
+        };
+
+        deleteCommand.SetAction(parseResult =>
+        {
+            int idInput = parseResult.GetValue(getTaskIdArgument);
+
+            deleteTask(idInput);
+
+            return 0;
+        });
+
         var rootCommand = new RootCommand("TaskTracer Command-Line Tool");
         rootCommand.Subcommands.Add(addCommand);
         rootCommand.Subcommands.Add(updateCommand);
+        rootCommand.Subcommands.Add(deleteCommand);
 
         return rootCommand.Parse(args).Invoke();
     }
@@ -116,5 +132,30 @@ public class Program
         string jsonString = JsonSerializer.Serialize<List<TaskTODO>>(tasks, JsonOptions);
 
         File.WriteAllText(fileName, jsonString);            
+    }
+
+    public static void deleteTask(int id)
+    {
+        List<TaskTODO> tasks = new List<TaskTODO>();
+        string fileName = "TaskTODO.json";
+
+        string existingJson = File.ReadAllText("TaskTODO.json");
+
+        if (!string.IsNullOrWhiteSpace(existingJson))
+        {
+            tasks = JsonSerializer.Deserialize<List<TaskTODO>>(existingJson) ?? new List<TaskTODO>();
+        }
+
+        TaskTODO? task = tasks.FirstOrDefault(t => t.id == id);
+
+        if(task != null)
+        {
+            tasks.Remove(task);
+            Console.WriteLine("Task deleted successfully.");
+        }
+
+        string jsonString = JsonSerializer.Serialize<List<TaskTODO>>(tasks, JsonOptions);
+
+        File.WriteAllText(fileName, jsonString);
     }
 }
