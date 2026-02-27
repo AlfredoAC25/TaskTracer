@@ -66,16 +66,42 @@ public class Program
         deleteCommand.SetAction(parseResult =>
         {
             int idInput = parseResult.GetValue(getTaskIdArgument);
-
             deleteTask(idInput);
-
             return 0;
         });
+
+        //  Mark a task as in-progress
+        var markInProgress = new Command("mark-in-progress", "Mark a task as in-progress")
+        {
+            getTaskIdArgument
+        };
+        markInProgress.SetAction(parseResult =>
+        {
+            int idInput = parseResult.GetValue(getTaskIdArgument);
+            changeStatus(idInput, TaskStatusTodo.InProgress);
+            return 0;
+        });
+
+        //  Mark a task as done
+        var markDone = new Command("mark-done", "Mark a task as done")
+        {
+            getTaskIdArgument
+        };
+        markDone.SetAction(parseResult =>
+        {
+            int idInput = parseResult.GetValue(getTaskIdArgument);
+            changeStatus(idInput, TaskStatusTodo.Done);
+            return 0;
+        });
+
+
 
         var rootCommand = new RootCommand("TaskTracer Command-Line Tool");
         rootCommand.Subcommands.Add(addCommand);
         rootCommand.Subcommands.Add(updateCommand);
         rootCommand.Subcommands.Add(deleteCommand);
+        rootCommand.Subcommands.Add(markInProgress);
+        rootCommand.Subcommands.Add(markDone);
 
         return rootCommand.Parse(args).Invoke();
     }
@@ -153,6 +179,28 @@ public class Program
             tasks.Remove(task);
             Console.WriteLine("Task deleted successfully.");
         }
+
+        string jsonString = JsonSerializer.Serialize<List<TaskTODO>>(tasks, JsonOptions);
+
+        File.WriteAllText(fileName, jsonString);
+    }
+
+
+    public static void changeStatus(int id, TaskStatusTodo taskStatusTodo)
+    {
+        List<TaskTODO> tasks = new List<TaskTODO>();
+        string fileName = "TaskTODO.json";
+
+        string existingJson = File.ReadAllText("TaskTODO.json");
+
+        if (!string.IsNullOrWhiteSpace(existingJson))
+        {
+            tasks = JsonSerializer.Deserialize<List<TaskTODO>>(existingJson) ?? new List<TaskTODO>();
+        }
+
+        TaskTODO? task = tasks.FirstOrDefault(t => t.id == id);
+
+        task?.status = taskStatusTodo;
 
         string jsonString = JsonSerializer.Serialize<List<TaskTODO>>(tasks, JsonOptions);
 
