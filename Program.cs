@@ -245,5 +245,6 @@ public class Program
         else
             foreach(var task in tasks)
                 Console.WriteLine(task);
+                //Console.WriteLine($"ID: {task.id}, Desc: {task.description}, Status: {task.status}");
     }
 }

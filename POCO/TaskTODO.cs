@@ -12,5 +12,10 @@ namespace scl.POCO
         public TaskStatusTodo status { get; set; }
         public DateTime createdAt { get; set; }
         public DateTime updatedAt { get; set; }
+
+        public override string ToString()
+        {
+            return $"ID: {id} | Description: {description} | Status: {status} | CreatedAt: {createdAt} | UpdatedAt: {updatedAt}";
+        }
     }
 }
