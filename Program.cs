@@ -1,7 +1,6 @@
 ﻿using System.CommandLine;
 using System.Text.Json;
 using scl.POCO;
-using System.Linq;
 using scl.Enums;
 
 public class Program
@@ -71,11 +70,11 @@ public class Program
         });
 
         //  Mark a task as in-progress
-        var markInProgress = new Command("mark-in-progress", "Mark a task as in-progress")
+        var markInProgressCommand = new Command("mark-in-progress", "Mark a task as in-progress")
         {
             getTaskIdArgument
         };
-        markInProgress.SetAction(parseResult =>
+        markInProgressCommand.SetAction(parseResult =>
         {
             int idInput = parseResult.GetValue(getTaskIdArgument);
             changeStatus(idInput, TaskStatusTodo.InProgress);
@@ -83,25 +82,48 @@ public class Program
         });
 
         //  Mark a task as done
-        var markDone = new Command("mark-done", "Mark a task as done")
+        var markDoneCommand = new Command("mark-done", "Mark a task as done")
         {
             getTaskIdArgument
         };
-        markDone.SetAction(parseResult =>
+        markDoneCommand.SetAction(parseResult =>
         {
             int idInput = parseResult.GetValue(getTaskIdArgument);
             changeStatus(idInput, TaskStatusTodo.Done);
             return 0;
         });
 
-
+        // List tasks
+        var listByStatus = new Argument<string?>("status")
+        {
+            Description = "Status wanted to list"
+        };
+        listByStatus.Arity = ArgumentArity.ZeroOrOne;
+        var listCommand = new Command("list", "List all taks")
+        {
+            listByStatus,
+        };
+        listCommand.SetAction(parseResult =>
+        {
+            string? status = parseResult.GetValue(listByStatus);
+            TaskStatusTodo? taskStatusTodo = status switch
+            {
+                "todo" => TaskStatusTodo.Todo,
+                "in-progress" => TaskStatusTodo.InProgress,
+                "done" => TaskStatusTodo.Done,
+                _ => null
+            };
+            listTasks(taskStatusTodo);
+            return 0;
+        });
 
         var rootCommand = new RootCommand("TaskTracer Command-Line Tool");
         rootCommand.Subcommands.Add(addCommand);
         rootCommand.Subcommands.Add(updateCommand);
         rootCommand.Subcommands.Add(deleteCommand);
-        rootCommand.Subcommands.Add(markInProgress);
-        rootCommand.Subcommands.Add(markDone);
+        rootCommand.Subcommands.Add(markInProgressCommand);
+        rootCommand.Subcommands.Add(markDoneCommand);
+        rootCommand.Subcommands.Add(listCommand);
 
         return rootCommand.Parse(args).Invoke();
     }
@@ -205,5 +227,23 @@ public class Program
         string jsonString = JsonSerializer.Serialize<List<TaskTODO>>(tasks, JsonOptions);
 
         File.WriteAllText(fileName, jsonString);
+    }
+
+    public static void listTasks(TaskStatusTodo? taskStatusTodo = null)
+    {
+        List<TaskTODO> tasks = new List<TaskTODO>();
+        string fileName = "TaskTODO.json";
+
+        string existingJson = File.ReadAllText("TaskTODO.json");
+
+        if (!string.IsNullOrWhiteSpace(existingJson))
+            tasks = JsonSerializer.Deserialize<List<TaskTODO>>(existingJson) ?? new List<TaskTODO>();
+
+        if(taskStatusTodo != null)
+            foreach(var task in tasks)
+                Console.WriteLine(task.status == taskStatusTodo ? task : null);
+        else
+            foreach(var task in tasks)
+                Console.WriteLine(task);
     }
 }
