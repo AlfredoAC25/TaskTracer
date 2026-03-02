@@ -22,7 +22,7 @@ A simple Command-line program in C# to track your tasks and manage your to-do li
 - SO: Windows / Linux / macOS
 
 ## Installation
-Clonar e instalar dependencias:
+Clone and install dependencies:
 
 ```bash
 git clone git@github.com:AlfredoAC25/TaskTracer.git
@@ -57,4 +57,5 @@ dotnet run list in-progress
 
 ## Project Roadmap
 This project is part of a set of practice projects from the C# roadmap.
+
 https://roadmap.sh/projects/task-tracker
