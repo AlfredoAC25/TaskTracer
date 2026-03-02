@@ -7,7 +7,7 @@ A simple Command-line program in C# to track your tasks and manage your to-do li
 - [Requirements](#Requirements)
 - [Installation](#Installation)
 - [Usage](#Usage)
-- [Project Roadmap](#Project Roadmap)
+- [Project Roadmap](#ProjectRoadmap)
 
 ## Features
 - ✅Add, Update, and Delete tasks
@@ -55,7 +55,8 @@ dotnet run list todo
 dotnet run list in-progress
 ```
 
-## Project Roadmap
+## ProjectRoadmap
 This project is part of a set of practice projects from the C# roadmap.
 
 https://roadmap.sh/projects/task-tracker
+
